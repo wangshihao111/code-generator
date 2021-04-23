@@ -1,7 +1,7 @@
 import template from "@babel/template";
 import generate from "@babel/generator";
 import * as t from "@babel/types";
-import { insertImport } from "./utils";
+import { createArrowFunction, insertImport } from "./utils";
 import fs from "fs";
 
 const node = template("let a = <div>11</div>; return a;", {
@@ -10,19 +10,11 @@ const node = template("let a = <div>11</div>; return a;", {
 
 const fileBody: t.Statement[] = [];
 
-const componentName = t.identifier("Component");
-componentName.typeAnnotation = t.tsTypeAnnotation(
-  t.tsTypeReference(t.identifier("FC"))
+const fcNode = createArrowFunction(
+  { name: "Component", type: "FC" },
+  [{ name: "props" }],
+  node as any
 );
-const fcNode = t.variableDeclaration("const", [
-  t.variableDeclarator(
-    componentName,
-    t.arrowFunctionExpression(
-      [t.identifier("props")],
-      t.blockStatement(node as any[])
-    )
-  ),
-]);
 
 fileBody.push(fcNode);
 fileBody.push(t.exportDefaultDeclaration(t.identifier("Component")));
