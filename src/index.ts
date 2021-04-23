@@ -1,7 +1,7 @@
 import template from "@babel/template";
 import generate from "@babel/generator";
 import * as t from "@babel/types";
-import { createArrowFunction, insertImport } from "./utils";
+import { createArrowFunction, createExportDefault, insertExport, insertImport } from "./utils";
 import fs from "fs";
 
 const node = template("let a = <div>11</div>; return a;", {
@@ -17,7 +17,10 @@ const fcNode = createArrowFunction(
 );
 
 fileBody.push(fcNode);
-fileBody.push(t.exportDefaultDeclaration(t.identifier("Component")));
+fileBody.push(createExportDefault("Component"));
+
+insertExport(fileBody, 'Component');
+insertExport(fileBody, 'React');
 
 insertImport(fileBody, { name: "React", source: "react" });
 insertImport(fileBody, { name: ["Spin", "Input"], source: "antd" });
