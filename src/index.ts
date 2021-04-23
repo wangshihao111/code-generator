@@ -4,8 +4,6 @@ import generate from "@babel/generator";
 import * as t from "@babel/types";
 import fs from "fs";
 
-const root = parser.parse("");
-
 export const buildImportStatement = template(
   "import MODULE_NAME from 'MODULE';"
 );
@@ -19,7 +17,8 @@ const node = template("let a = <div>11</div>; return a;", {
   plugins: ["jsx"],
 })();
 
-const fileBody = root.program.body;
+// const fileBody = root.program.body;
+const fileBody: t.Statement[] = [];
 
 const componentName = t.identifier("Component");
 componentName.typeAnnotation = t.tsTypeAnnotation(
@@ -43,4 +42,6 @@ fileBody.unshift(
   ...getImportStatement({ MODULE_NAME: "{ Button }", MODULE: "antd" })
 );
 
-fs.writeFileSync("./test.tsx", generate(root).code, "utf8");
+const root = t.file(t.program(fileBody))
+
+fs.writeFileSync("./tests/test.tsx", generate(root).code, "utf8");
